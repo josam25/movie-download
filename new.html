@@ -1,0 +1,451 @@
+<html><head><base href="https://cinemaverse.app/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>CinemaVerse - Ultimate Movie Download Experience</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html { height: 100%; overflow: hidden; font-family: 'Poppins', sans-serif; }
+    #app { height: 100%; display: flex; flex-direction: column; }
+    
+    #background {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        transition: opacity 2s ease-in-out;
+    }
+    
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .content { 
+        position: relative; z-index: 1; flex: 1; 
+        display: flex; flex-direction: column;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+    }
+    
+    header {
+        padding: 20px;
+        text-align: center;
+        font-size: 36px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .logo {
+        font-size: 48px;
+        background: linear-gradient(45deg, #ff4e50, #f9d423);
+        
+        -webkit-text-fill-color: transparent;
+        transform: perspective(500px) rotateX(15deg);
+        transition: transform 0.3s ease;
+    }
+    
+    .logo:hover {
+        transform: perspective(500px) rotateX(0deg);
+    }
+    
+    nav {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    nav button {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 18px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    nav button:hover {
+        transform: scale(1.1);
+    }
+    
+    nav button::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, #ff4e50, #f9d423);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    nav button:hover::after {
+        transform: scaleX(1);
+    }
+    
+    main { flex: 1; overflow-y: auto; padding: 20px; }
+    
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 30px;
+        animation: fadeIn 1s ease-out;
+    }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    .movie-card {
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .movie-card:hover {
+        transform: translateY(-15px) scale(1.1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    
+    .movie-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .movie-card:hover img {
+        transform: scale(1.1);
+    }
+    
+    .movie-card .title {
+        padding: 15px;
+        color: #fff;
+        text-align: center;
+        font-weight: 600;
+        background: rgba(0,0,0,0.7);
+    }
+    
+    #settings-panel {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 400px;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        transition: right 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        padding: 30px;
+        color: #fff;
+        overflow-y: auto;
+    }
+    
+    #settings-panel.open { right: 0; }
+    
+    .setting-item {
+        margin-bottom: 30px;
+        opacity: 0;
+        transform: translateX(50px);
+        transition: all 0.5s ease;
+    }
+    
+    #settings-panel.open .setting-item {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .setting-item label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .setting-item select,
+    .setting-item input[type="range"] {
+        width: 100%;
+        padding: 10px;
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    
+    .setting-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+    
+    #download-progress {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: #fff;
+        padding: 15px 30px;
+        border-radius: 30px;
+        font-size: 18px;
+        display: none;
+    }
+</style>
+</head>
+<body>
+<div id="app">
+    <div id="background"></div>
+    <div class="content">
+        <header>
+            <div class="logo">CinemaVerse</div>
+        </header>
+        <nav>
+            <button onclick="showHome()">Home</button>
+            <button onclick="showDownloads()">Downloads</button>
+            <button onclick="toggleSettings()">Settings</button>
+        </nav>
+        <main id="main-content">
+            <div class="movie-grid" id="movie-grid"></div>
+        </main>
+    </div>
+    <div id="settings-panel">
+        <h2>Settings</h2>
+        <div class="setting-item">
+            <label for="theme">Theme:</label>
+            <select id="theme" onchange="changeTheme()">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="neon">Neon</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label for="quality">Download Quality:</label>
+            <select id="quality">
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
+                <option value="4k">4K</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label for="downloadSpeed">Download Speed Limit:</label>
+            <input type="range" id="downloadSpeed" min="0" max="100" value="100">
+        </div>
+        <div class="setting-item">
+            <label for="darkMode">Dark Mode:</label>
+            <input type="checkbox" id="darkMode">
+        </div>
+        <div class="setting-item">
+            <label for="fontsize">Font Size:</label>
+            <select id="fontsize">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label for="autoplay">Autoplay Trailers:</label>
+            <input type="checkbox" id="autoplay">
+        </div>
+        <div class="setting-item">
+            <label for="notifications">Enable Notifications:</label>
+            <input type="checkbox" id="notifications">
+        </div>
+        <div class="setting-item">
+            <label for="storage">Storage Usage:</label>
+            <input type="range" id="storage" min="0" max="100" value="50">
+        </div>
+        <div class="setting-item">
+            <label for="subtitle">Subtitle Language:</label>
+            <select id="subtitle">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label for="audio">Audio Language:</label>
+            <select id="audio">
+                <option value="original">Original</option>
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+            </select>
+        </div>
+    </div>
+    <div id="download-progress"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    const movieData = [
+        { title: "Inception", image: "https://source.unsplash.com/random/400x600?inception", qualities: ["720p", "1080p", "4K"] },
+        { title: "The Matrix", image: "https://source.unsplash.com/random/400x600?matrix", qualities: ["720p", "1080p", "4K"] },
+        { title: "Interstellar", image: "https://source.unsplash.com/random/400x600?space", qualities: ["720p", "1080p", "4K"] },
+        { title: "Pulp Fiction", image: "https://source.unsplash.com/random/400x600?pulp", qualities: ["720p", "1080p", "4K"] },
+        { title: "The Shawshank Redemption", image: "https://source.unsplash.com/random/400x600?prison", qualities: ["720p", "1080p", "4K"] },
+        { title: "The Godfather", image: "https://source.unsplash.com/random/400x600?mafia", qualities: ["720p", "1080p", "4K"] },
+        { title: "The Dark Knight", image: "https://source.unsplash.com/random/400x600?batman", qualities: ["720p", "1080p", "4K"] },
+        { title: "Forrest Gump", image: "https://source.unsplash.com/random/400x600?running", qualities: ["720p", "1080p", "4K"] }
+    ];
+
+    const backgrounds = [
+        'https://source.unsplash.com/random/1920x1080?cinema',
+        'https://source.unsplash.com/random/1920x1080?movie',
+        'https://source.unsplash.com/random/1920x1080?film'
+    ];
+
+    let currentBackground = 0;
+
+    function changeBackground() {
+        const nextBackground = (currentBackground + 1) % backgrounds.length;
+        const newBackground = document.createElement('div');
+        newBackground.id = 'background';
+        newBackground.style.backgroundImage = `url(${backgrounds[nextBackground]})`;
+        newBackground.style.opacity = '0';
+        document.body.appendChild(newBackground);
+
+        gsap.to(newBackground, { opacity: 1, duration: 2, onComplete: () => {
+            document.body.removeChild(document.getElementById('background'));
+            newBackground.id = 'background';
+            currentBackground = nextBackground;
+        }});
+    }
+
+    function populateMovies() {
+        const grid = document.getElementById('movie-grid');
+        grid.innerHTML = '';
+        movieData.forEach(movie => {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.innerHTML = `
+                <img src="${movie.image}" alt="${movie.title}">
+                <div class="title">${movie.title}</div>
+            `;
+            card.addEventListener('click', () => downloadMovie(movie.title));
+            grid.appendChild(card);
+        });
+    }
+
+    function downloadMovie(title) {
+        const progress = document.getElementById('download-progress');
+        progress.style.display = 'block';
+        progress.textContent = `Downloading ${title}... 0%`;
+
+        let percent = 0;
+        const interval = setInterval(() => {
+            percent += Math.random() * 10;
+            if (percent > 100) {
+                percent = 100;
+                clearInterval(interval);
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                }, 2000);
+            }
+            progress.textContent = `Downloading ${title}... ${Math.floor(percent)}%`;
+        }, 500);
+    }
+
+    function showHome() {
+        gsap.to('#main-content', { opacity: 0, duration: 0.3, onComplete: () => {
+            populateMovies();
+            gsap.to('#main-content', { opacity: 1, duration: 0.3 });
+        }});
+    }
+
+    function showDownloads() {
+        gsap.to('#main-content', { opacity: 0, duration: 0.3, onComplete: () => {
+            document.getElementById('main-content').innerHTML = '<h2 style="color: #fff; text-align: center;">Downloads</h2><p style="color: #fff; text-align: center;">Your downloads will appear here.</p>';
+            gsap.to('#main-content', { opacity: 1, duration: 0.3 });
+        }});
+    }
+
+    function toggleSettings() {
+        const panel = document.getElementById('settings-panel');
+        panel.classList.toggle('open');
+    }
+
+    function changeTheme() {
+        const theme = document.getElementById('theme').value;
+        document.body.className = theme;
+    }
+
+    // 3D Text Animation
+    function init3DText() {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const loader = new THREE.FontLoader();
+        loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
+            const textGeometry = new THREE.TextGeometry('CinemaVerse', {
+                font: font,
+                size: 70,
+                height: 20,
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+            });
+
+            const textMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+            scene.add(textMesh);
+
+            camera.position.z = 200;
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(0, 0, 50);
+            scene.add(light);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                textMesh.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+        });
+    }
+
+    // Initialize the app
+    populateMovies();
+    setInterval(changeBackground, 10000); // Change background every 10 seconds
+    init3DText();
+
+    // Platform check and optimizations
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = userAgent.indexOf("android") > -1;
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    
+    if (isAndroid) {
+        console.log("Running on Android");
+        // Android-specific optimizations
+        document.body.classList.add('android');
+    } else if (isIOS) {
+        console.log("Running on iOS");
+        // iOS-specific optimizations
+        document.body.classList.add('ios');
+    } else {
+        console.log("Running on another platform");
+    }
+
+    // Responsive design adjustments
+    window.addEventListener('resize', () => {
+        if (window.innerWidth < 768) {
+            document.body.classList.add('mobile');
+        } else {
+            document.body.classList.remove('mobile');
+        }
+    });
+</script>
+</body></html>
